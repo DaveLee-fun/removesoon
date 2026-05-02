@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>비개발자를 위한 클로드코드 입문</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #ff6b35;
+    --primary-dark: #e85a2a;
+    --bg: #0f0f1a;
+    --bg-soft: #1a1a2e;
+    --card: #1f1f35;
+    --text: #f5f5f7;
+    --text-mute: #a8a8b8;
+    --accent: #6c5ce7;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Navigation */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 100;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  nav .cta {
+    background: var(--primary);
+    color: #fff;
+    padding: 0.55rem 1.2rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+  }
+  nav .cta:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6rem 1.5rem 4rem;
+    text-align: center;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,107,53,0.18), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(108,92,231,0.18), transparent 50%),
+      var(--bg);
+    position: relative;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(255,107,53,0.12);
+    color: var(--primary);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255,107,53,0.3);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 1.2rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--primary), #ffb88c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--text-mute);
+    max-width: 640px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-primary, .btn-secondary {
+    padding: 0.95rem 1.8rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(255,107,53,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255,107,53,0.5); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+
+  /* Sections */
+  section {
+    padding: 5rem 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--text-mute);
+    margin-bottom: 3rem;
+    font-size: 1.05rem;
+  }
+
+  /* Features */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .feature-card {
+    background: var(--card);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,107,53,0.4);
+  }
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  .feature-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+  .feature-card p {
+    color: var(--text-mute);
+    font-size: 0.95rem;
+  }
+
+  /* Curriculum */
+  .curriculum {
+    background: var(--bg-soft);
+  }
+  .curriculum-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .lesson {
+    background: var(--card);
+    margin-bottom: 0.8rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .lesson:hover { border-color: rgba(255,107,53,0.3); }
+  .lesson-header {
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    user-select: none;
+  }
+  .lesson-num {
+    color: var(--primary);
+    font-weight: 700;
+    margin-right: 0.8rem;
+  }
+  .lesson-toggle {
+    color: var(--text-mute);
+    transition: transform 0.3s;
+    font-size: 1.2rem;
+  }
+  .lesson.open .lesson-toggle { transform: rotate(45deg); }
+  .lesson-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 1.5rem;
+    color: var(--text-mute);
+  }
+  .lesson.open .lesson-body {
+    max-height: 200px;
+    padding: 0 1.5rem 1.2rem;
+  }
+
+  /* CTA */
+  .cta-section {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(108,92,231,0.12));
+    border-radius: 24px;
+    margin: 4rem auto;
+    padding: 4rem 2rem;
+    max-width: 900px;
+  }
+  .cta-section h2 {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+  .cta-section p {
+    color: var(--text-mute);
+    margin-bottom: 2rem;
+    font-size: 1.05rem;
+  }
+  .price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
+  }
+  .price-note {
+    color: var(--text-mute);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: var(--text-mute);
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 0.8rem 1rem; }
+    section { padding: 3.5rem 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CLAUDE CODE 입문</div>
+  <a href="#enroll" class="cta">수강 신청</a>
+</nav>
+
+<section class="hero">
+  <span class="badge">코딩 0줄도 OK</span>
+  <h1>
+    비개발자를 위한<br>
+    <span class="accent">클로드코드 입문</span>
+  </h1>
+  <p>
+    터미널이 두려운 분도 괜찮습니다. 자연어로 대화하듯 명령하고,
+    AI가 직접 코드를 작성·수정·실행하는 새로운 작업 방식을 배워봅니다.
+  </p>
+  <div class="hero-buttons">
+    <a href="#enroll" class="btn-primary">지금 시작하기</a>
+    <a href="#curriculum" class="btn-secondary">커리큘럼 보기</a>
+  </div>
+</section>
+
+<section id="features">
+  <h2 class="section-title">왜 클로드코드인가요?</h2>
+  <p class="section-sub">개발자가 아니어도 누구나 쓸 수 있는, 진짜 일하는 AI 코딩 파트너</p>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <h3>한국어로 대화</h3>
+      <p>"이 파일 정리해줘", "버그 찾아줘"처럼 평소 말투로 명령하면 충분합니다.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>실제 파일을 다룸</h3>
+      <p>Claude가 직접 파일을 읽고 수정하고 실행합니다. 복사/붙여넣기 끝.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>업무 자동화</h3>
+      <p>엑셀 정리, 데이터 변환, 문서 작성까지 반복 작업을 한 번에 해결합니다.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <h3>실수 없이 안전하게</h3>
+      <p>중요한 작업은 확인 절차를 거치고, 되돌릴 수 있는 방식으로 진행합니다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="curriculum" class="curriculum" style="max-width: none;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <h2 class="section-title">커리큘럼</h2>
+    <p class="section-sub">총 6강 · 약 4시간 · 실습 위주</p>
+    <div class="curriculum-wrap">
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">01</span>클로드코드 첫 만남과 설치</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">설치부터 첫 실행까지, 비개발자 눈높이에서 한 단계씩 따라합니다.</div>
+      </div>
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">02</span>파일 다루기 기본기</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">텍스트, 엑셀, PDF 파일을 AI에게 맡기는 법을 익힙니다.</div>
+      </div>
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">03</span>업무 자동화 실습</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">매주 반복하는 보고서 작성을 클로드에게 맡겨봅니다.</div>
+      </div>
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">04</span>나만의 미니 웹페이지 만들기</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">코딩 한 줄 없이, 대화만으로 간단한 웹페이지를 완성합니다.</div>
+      </div>
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">05</span>안전하게 쓰는 법</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">권한 설정, 백업, 되돌리기 등 실수 없이 쓰기 위한 팁.</div>
+      </div>
+      <div class="lesson">
+        <div class="lesson-header"><span><span class="lesson-num">06</span>실전 프로젝트 데모</span><span class="lesson-toggle">+</span></div>
+        <div class="lesson-body">실제 사례를 보며, 내 업무에 어떻게 적용할지 함께 설계합니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="enroll">
+  <div class="cta-section">
+    <h2>지금 시작하세요</h2>
+    <p>강의 + 실습 자료 + 커뮤니티 평생 액세스</p>
+    <div class="price">₩ 79,000</div>
+    <div class="price-note">얼리버드 30% 할인가</div>
+    <a href="#" class="btn-primary" onclick="enroll(event)">수강 신청하기</a>
+  </div>
+</section>
+
+<footer>
+  © 2026 비개발자를 위한 클로드코드 입문 · 모든 권리 보유
+</footer>
+
+<script>
+  document.querySelectorAll('.lesson-header').forEach(h => {
+    h.addEventListener('click', () => {
+      h.parentElement.classList.toggle('open');
+    });
+  });
+
+  function enroll(e) {
+    e.preventDefault();
+    alert('수강 신청 페이지로 이동합니다. (데모)');
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id.length > 1) {
+        const el = document.querySelector(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
